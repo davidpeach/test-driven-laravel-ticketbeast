@@ -13,12 +13,9 @@ class ViewConcertListingTest extends TestCase
     use RefreshDatabase;
 
     /** @test */
-    public function user_can_view_a_concert_listing()
+    public function user_can_view_a_published_concert_listing()
     {
-        $this->withoutExceptionHandling();
-
-        // ...Given we have a concert...
-        $concert = Concert::create([
+        $concert = factory(Concert::class)->states('published')->create([
             'title' => 'The Main Act',
             'subtitle' => 'Supporting Roles',
             'date' => Carbon::parse('December 13th 2020 8:00pm'),
@@ -28,14 +25,11 @@ class ViewConcertListingTest extends TestCase
             'city' => 'Laraville',
             'state' => 'Staffs',
             'zip' => 'B783RB',
-            'additional_information' => 'For tickets, call (555) 555 555'
+            'additional_information' => 'For tickets, call (555) 555 555',
         ]);
 
-        // ...When we try to view the conert listing...
         $res = $this->get('/concerts/' . $concert->id);
 
-        // ...Then we should see the concert details...
-        // $res->assertStatus(200);
         $res->assertSee('The Main Act');
         $res->assertSee('Supporting Roles');
         $res->assertSee('December 13, 2020');
@@ -46,5 +40,15 @@ class ViewConcertListingTest extends TestCase
         $res->assertSee('Staffs');
         $res->assertSee('B783RB');
         $res->assertSee('For tickets, call (555) 555 555');
+    }
+
+    /** @test */
+    public function user_cannot_view_unpublished_concert_listings()
+    {
+        $concert = factory(Concert::class)->states('unpublished')->create();
+
+        $res = $this->get('/concerts/' . $concert->id);
+
+        $res->assertStatus(404);
     }
 }
