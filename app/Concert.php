@@ -29,4 +29,22 @@ class Concert extends Model
     {
         return number_format($this->ticket_price / 100, 2);
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function orderTickets($email, $quantity)
+    {
+        $order = $this->orders()->create([
+            'email' => $email,
+        ]);
+
+        foreach (range(1, $quantity) as $i) {
+            $order->tickets()->create([]);
+        }
+
+        return $order;
+    }
 }
