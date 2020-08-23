@@ -23,7 +23,11 @@ class PurchaseTicketsTest extends TestCase
 
     private function orderTickets($concert, $params)
     {
-        return $this->json('POST', "/concerts/{$concert->id}/orders", $params);
+        $savedRequest = $this->app['request'];
+        $order = $this->json('POST', "/concerts/{$concert->id}/orders", $params);
+        $this->app['request'] = $savedRequest;
+
+        return $order;
     }
 
     private function assertValidationError($field, $response)
@@ -187,6 +191,7 @@ class PurchaseTicketsTest extends TestCase
         $concert = factory(Concert::class)->states('published')->create(['ticket_price' => 1200])->addTickets(3);
 
         $this->paymentGateway->beforeFirstCharge(function ($paymentGateway) use ($concert) {
+
             $responseB = $this->orderTickets($concert, [
                 'email' => 'personB@example.com',
                 'ticket_quantity' => 1,
