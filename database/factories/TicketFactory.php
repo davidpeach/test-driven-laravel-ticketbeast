@@ -4,6 +4,7 @@
 
 use App\Concert;
 use App\Ticket;
+use Carbon\Carbon;
 use Faker\Generator as Faker;
 
 $factory->define(Ticket::class, function (Faker $faker) {
@@ -11,5 +12,11 @@ $factory->define(Ticket::class, function (Faker $faker) {
         'concert_id' => function () {
             return factory(Concert::class)->create()->id;
         },
+    ];
+});
+
+$factory->state(Ticket::class, 'reserved', function ($faker) {
+    return [
+        'reserved_at' => Carbon::now(),
     ];
 });
