@@ -28,6 +28,15 @@ class Reservation
         return $this->email;
     }
 
+    public function complete()
+    {
+        return Order::forTickets(
+            $this->tickets(),
+            $this->email(),
+            $this->totalCost()
+        );
+    }
+
     public function cancel()
     {
         $this->tickets->each->release();

@@ -11,6 +11,9 @@ use Tests\TestCase;
 
 class ReservationTest extends TestCase
 {
+
+    use RefreshDatabase;
+
     /** @test */
     public function calculating_the_total_cost()
     {
@@ -45,6 +48,21 @@ class ReservationTest extends TestCase
         $reservation = new Reservation(collect(), 'john@example.com');
 
         $this->assertEquals('john@example.com', $reservation->email());
+    }
+
+    /** @test */
+    public function completing_a_reservation()
+    {
+        $concert = factory(Concert::class)->create(['ticket_price' => 1200]);
+        $tickets = factory(Ticket::class, 3)
+            ->create(['concert_id' => $concert->id]);
+        $reservation = new Reservation($tickets, 'jane@example.com');
+
+        $order = $reservation->complete();
+
+        $this->assertEquals('jane@example.com', $order->email);
+        $this->assertEquals(3, $order->ticketQuantity());
+        $this->assertEquals(3600, $order->amount);
     }
 
     /** @test */
