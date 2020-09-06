@@ -35,12 +35,10 @@ class ConcertOrdersController extends Controller
                 request('email')
             );
 
-            $this->paymentGateway->charge(
-                $reservation->totalCost(),
+            $order = $reservation->complete(
+                $this->paymentGateway,
                 request('payment_token')
             );
-
-            $order = $reservation->complete();
 
             return response()->json($order, 201);
         } catch (PaymentFailedException $e) {
